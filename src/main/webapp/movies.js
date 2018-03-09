@@ -1,5 +1,18 @@
 var init = () => {
 	var tblBody = document.getElementById("tblBody");
+	var addToTable = (m) => {
+		tblBody.innerHTML +=
+			"<tr>"+
+			"<td>"+m.title+"</td>"+
+			"<td>"+m.releasedDate+"</td>"+
+			"<td>"+m.budget+"</td>"+
+			"<td><img"+
+			"	src=\""+m.poster+"\""+
+			"	width=\"30px\"></td>"+
+			"<td>"+m.category+"</td>"+
+			"<td>"+m.status+"</td>"+
+			"</tr>";
+	}
 	tblBody.innerHTML = "";
 	var shapeOfWater = {
 		title: "The Shape of Water",
@@ -9,16 +22,30 @@ var init = () => {
 		category: "Best Picture",
 		status: "yes"
 	};
-	tblBody.innerHTML +=
-	"<tr>"+
-	"<td>"+shapeOfWater.title+"</td>"+
-	"<td>"+shapeOfWater.releasedDate+"</td>"+
-	"<td>"+shapeOfWater.budget+"</td>"+
-	"<td><img"+
-	"	src=\""+shapeOfWater.poster+"\""+
-	"	width=\"30px\"></td>"+
-	"<td>"+shapeOfWater.category+"</td>"+
-	"<td>"+shapeOfWater.status+"</td>"+
-	"</tr>";
+	var ladyBird = {
+			title: "Lady Bird",
+			releasedDate: "2017-12-01E",
+			budget: "15.000.000",
+			poster: "https://images-na.ssl-images-amazon.com/images/M/MV5BODhkZGE0NDQtZDc0Zi00YmQ4LWJiNmUtYTY1OGM1ODRmNGVkXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg",
+			category: "Best Picture",
+			status: "no"
+		};
+	var getOut = {
+			title: "Get Out",
+			releasedDate: "2017-02-24",
+			budget: "5.000.000",
+			poster: "https://images-na.ssl-images-amazon.com/images/M/MV5BMjUxMDQwNjcyNl5BMl5BanBnXkFtZTgwNzcwMzc0MTI@._V1_UX182_CR0,0,182,268_AL_.jpg",
+			category: "Best Picture",
+			status: "no"
+		};
+	var threeBillboards = {
+			title: "Three Billboards Outside Ebbing, Missouri",
+			releasedDate: "2017-12-01",
+			budget: "15.000.000",
+			poster: "https://images-na.ssl-images-amazon.com/images/M/MV5BZTZjYzU2NTktNTdmNi00OTM0LTg5MDgtNGFjOGMzNjY0MDk5XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg",
+			category: "Best Picture",
+			status: "no"
+		};
+	[shapeOfWater,ladyBird,getOut,threeBillboards].forEach((m) => addToTable(m));
 };
 addEventListener("load", init());
