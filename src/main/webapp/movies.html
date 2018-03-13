@@ -7,6 +7,49 @@
 <body>
 	<h1>Oscar 2018: The Complete List</h1>
 
+	<div id="messageArea"></div>
+	<form id="frm">
+		<fieldset>
+		<label>Title: </label>
+		<input id="movie.field.title" type="text" />
+		<span id="movie.help.title"></span>
+		</fieldset>
+		<fieldset>
+		<label>Released Date: </label>
+		<input id="movie.field.releasedDate" type="date" />
+		<span id="movie.help.releasedDate"></span>
+		</fieldset>
+		<fieldset>
+		<label>Budget: </label>
+		<input id="movie.field.budget" type="text" />
+		<span id="movie.help.budget"></span>
+		</fieldset>
+		<fieldset>
+		<label>Poster: </label>
+		<input id="movie.field.poster" type="text"  />
+		<span id="movie.help.poster"></span>
+		</fieldset>
+		<fieldset>
+		<label>Rating: </label>
+		<input id="movie.field.rating" type="number"  />
+		<span id="movie.help.rating"></span>
+		</fieldset>
+		<fieldset>
+		<label>Category: </label>
+		<select id="movie.field.category"><option value="Best Picture">Best Picture</option></select>
+		<span id="movie.help.category"></span>
+		</fieldset>
+		<fieldset>
+		<label>Result: </label>
+		<label><input id="movie.field.result.winner" name="movie.field.result" type="radio" value="winner" />Winner</label>
+		<label><input id="movie.field.result.nominee" name="movie.field.result" type="radio" value="nominee" />Nominee</label>
+		<span id="movie.help.result"></span>
+		</fieldset>
+		<fieldset>
+			<input id="btnSave" type="button" value="Save" />
+			<input id="btnBestPicture" type="button" value="Load Best Picture Nominees" />
+		</fieldset>
+	</form>
 	<table>
 		<thead>
 			<tr>
@@ -14,6 +57,7 @@
 				<th>released date</th>
 				<th>budget</th>
 				<th>poster</th>
+				<th>rating</th>
 				<th>category</th>
 				<th>winner</th>
 			</tr>
@@ -26,6 +70,7 @@
 				<td><img
 					src="https://drraa3ej68s2c.cloudfront.net/wp-content/uploads/2017/12/12163133/87954c22e6e3783117f13feadf7e9681f463b7011a91c7af2ebd1a962d20aa53-195x195.jpg"
 					width="30px"></td>
+				<td>74</td>
 				<td>Best Picture</td>
 				<td>yes</td>
 			</tr>
@@ -36,6 +81,7 @@
 				<td><img
 					src="https://images-na.ssl-images-amazon.com/images/M/MV5BODhkZGE0NDQtZDc0Zi00YmQ4LWJiNmUtYTY1OGM1ODRmNGVkXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg"
 					width="30px"></td>
+				<td>76</td>
 				<td>Best Picture</td>
 				<td>no</td>
 			</tr>
@@ -46,6 +92,7 @@
 				<td><img
 					src="https://images-na.ssl-images-amazon.com/images/M/MV5BMjUxMDQwNjcyNl5BMl5BanBnXkFtZTgwNzcwMzc0MTI@._V1_UX182_CR0,0,182,268_AL_.jpg"
 					width="30px"></td>
+				<td>74</td>
 				<td>Best Picture</td>
 				<td>no</td>
 			</tr>
@@ -56,6 +103,7 @@
 				<td><img
 					src="https://images-na.ssl-images-amazon.com/images/M/MV5BZTZjYzU2NTktNTdmNi00OTM0LTg5MDgtNGFjOGMzNjY0MDk5XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg"
 					width="30px"></td>
+				<td>82</td>
 				<td>Best Picture</td>
 				<td>no</td>
 			</tr>

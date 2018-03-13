@@ -1,12 +1,9 @@
 package br.com.voffice.jwp2018.tf01.oscar.controllers;
 
-import static br.com.voffice.jwp2018.tf01.oscar.controllers.MoviesControllerFunctions.toMapCollector;
-import static br.com.voffice.jwp2018.tf01.oscar.controllers.MoviesControllerFunctions.toMovie;
-import static br.com.voffice.jwp2018.tf01.oscar.controllers.MoviesControllerFunctions.toSingleMapper;
-
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -24,33 +21,24 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import br.com.voffice.jwp2018.tf01.oscar.domain.Movie;
 import br.com.voffice.jwp2018.tf01.oscar.services.MovieService;
 
-@WebServlet("/api/servlets/movies")
-public class MoviesController extends HttpServlet {
+@WebServlet("/api/servlets/movies/bestPicture")
+public class MoviesBestPictureController extends HttpServlet {
 
+	private static final String CATEGORY_BEST_PICTURE = "Best Picture";
 	private static final long serialVersionUID = 1L;
 	private static final MovieService service = new MovieService();
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Map<String, String[]> parameterMap = req.getParameterMap();
-		Map<String,String> parameters =
-		parameterMap.entrySet().stream().map(toSingleMapper).collect(toMapCollector);
-		String key = MoviesControllerFunctions.keyFromParameters.apply(parameters);
-		if (key == null) {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return;
-		}
-		EntityExtractor<Movie> movieExtractor = MoviesControllerFunctions.extractMovieGetPost.apply(req);
-		if (MoviesControllerFunctions.respondRequired.apply(resp).apply(movieExtractor.title)) return;
-		if (MoviesControllerFunctions.respondRequired.apply(resp).apply(movieExtractor.releasedDate)) return;
-
-		boolean created = service.create(toMovie.apply(parameters));
-		int status = (created)? HttpServletResponse.SC_CREATED: HttpServletResponse.SC_CONFLICT;
-		resp.setStatus(status);
-	}
-
-	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		Movie threeBillboards = new Movie("Three Billboards Outside Ebbing, Missouri", LocalDate.of(2017,12,01), 15_000_000d, "https://images-na.ssl-images-amazon.com/images/M/MV5BZTZjYzU2NTktNTdmNi00OTM0LTg5MDgtNGFjOGMzNjY0MDk5XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg", 82, CATEGORY_BEST_PICTURE,false);
+		Movie ladyBird = new Movie("Lady Bird", LocalDate.of(2017, 12, 1), 10_000_000d, "https://images-na.ssl-images-amazon.com/images/M/MV5BODhkZGE0NDQtZDc0Zi00YmQ4LWJiNmUtYTY1OGM1ODRmNGVkXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg", 76, CATEGORY_BEST_PICTURE, false);
+		Movie getOut = new Movie("Get Out", LocalDate.of(2017, 2,24), 5_000_000d, "https://images-na.ssl-images-amazon.com/images/M/MV5BMjUxMDQwNjcyNl5BMl5BanBnXkFtZTgwNzcwMzc0MTI@._V1_UX182_CR0,0,182,268_AL_.jpg", 74, CATEGORY_BEST_PICTURE, false);
+		Movie shapeOfWater = new Movie("Shape of Water", LocalDate.of(2017, 12, 22), 19_400_000d, "https://drraa3ej68s2c.cloudfront.net/wp-content/uploads/2017/12/12163133/87954c22e6e3783117f13feadf7e9681f463b7011a91c7af2ebd1a962d20aa53-195x195.jpg", 74, CATEGORY_BEST_PICTURE, true);
+		List<Movie> nominees = Arrays.asList(threeBillboards, ladyBird, getOut, shapeOfWater);
+
+		for (Movie nominee: nominees) {
+			service.create(nominee);
+		}
 		List<Movie> movies = service.findAll();
 		resp.setContentType("application/json");
 		ObjectMapper mapper = new ObjectMapper()
