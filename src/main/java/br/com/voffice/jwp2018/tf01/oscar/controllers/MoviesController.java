@@ -29,11 +29,6 @@ public class MoviesController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private static final MovieService service = new MovieService();
-	private static final ObjectMapper mapper = new ObjectMapper()
-			   .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-			   .registerModule(new ParameterNamesModule())
-			   .registerModule(new Jdk8Module())
-			   .registerModule(new JavaTimeModule());
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -58,16 +53,9 @@ public class MoviesController extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
 		List<Movie> movies = service.findAll();
-		resp.getWriter().write(toJSON(movies));
+		resp.getWriter().write(MoviesControllerFunctions.toJSON(movies));
 	}
 
-	private static String toJSON(List<Movie> movies) {
-		try {
-			return mapper.writeValueAsString(movies);
-		} catch (Exception e) {
-			Logger.getAnonymousLogger().severe(e::getMessage);
-			return "[]";
-		}
-	}
+
 }
 

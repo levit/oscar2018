@@ -1,7 +1,11 @@
 package br.com.voffice.jwp2018.tf01.oscar.controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
@@ -12,12 +16,20 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import br.com.voffice.jwp2018.tf01.oscar.domain.Movie;
 
@@ -211,6 +223,36 @@ public final class MoviesControllerFunctions {
 		}
 	};
 
+	public static final ObjectMapper mapper = new ObjectMapper()
+			   .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+			   .registerModule(new ParameterNamesModule())
+			   .registerModule(new Jdk8Module())
+			   .registerModule(new JavaTimeModule());
 
+	public static String toJSON(Object object) {
+		try {
+			return mapper.writeValueAsString(object);
+		} catch (Exception e) {
+			Logger.getAnonymousLogger().severe(e::getMessage);
+			return "[]";
+		}
+	}
+
+
+	public static final Predicate<? super Path> imageExtensionPredicate = p -> {
+		List<String> extensions = Arrays.asList(".jpg",".gif","png");
+		return extensions.stream().filter(e -> p.getFileName().toString().endsWith(e)).findFirst().isPresent();
+	};
+
+	public static final void savePart(String path, Part part) {
+		String name = part.getSubmittedFileName();
+		File folder = new File(path);
+		File file = new File(folder, name);
+		try (InputStream input = part.getInputStream()) {
+		    Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 }

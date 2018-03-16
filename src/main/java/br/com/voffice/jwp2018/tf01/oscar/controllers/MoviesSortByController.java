@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.HttpConstraint;
+import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ import br.com.voffice.jwp2018.tf01.oscar.domain.Movie;
 import br.com.voffice.jwp2018.tf01.oscar.services.MovieService;
 
 @WebServlet("/api/servlets/movies/sortBy")
+@ServletSecurity(@HttpConstraint(rolesAllowed = "sorter"))
 public class MoviesSortByController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -34,6 +37,7 @@ public class MoviesSortByController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
+		System.out.println(req.getUserPrincipal());
 		String sortBy = null;
 		sortBy = extractByField(req, "title", sortBy);
 		sortBy = extractByField(req, "budget", sortBy);

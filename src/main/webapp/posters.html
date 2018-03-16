@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Oscar 2018: Posters</title>
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+
+</head>
+<body>
+	<h1>Oscar 2018: Posters</h1>
+	<div class="container">
+		<div id="messageArea"></div>
+		<h1>Upload</h1>
+		<form method="post" enctype="multipart/form-data"
+			action="api/servlets/movies/posters">
+			<div class="form-group">
+				<input type="file" name="poster" multiple="multiple" accept="image/*">
+			</div>
+			<fieldset class="form-group">
+				<input type="submit" class="btn btn-primary class="form-control"" value="Send">
+			</fieldset>
+		</form>
+		<select id="postersSelect">
+		</select>
+	</div>
+
+	<script type="text/javascript">
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", "api/servlets/movies/posters",true);
+		xhr.onload = (e) => {
+			console.log(e.target.responseText);
+			var posters = JSON.parse(e.target.responseText);
+			var postersSelect = document.getElementById("postersSelect");
+			if (posters){
+				posters.forEach(p => postersSelect.appendChild(new Option(p,p)));
+			}
+		};
+		xhr.send();
+	</script>
+</body>
+</html>

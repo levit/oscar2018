@@ -1,0 +1,7 @@
+* Servlets: Parameters, Attributes, Session, URL Encoding, Redirect, Forward, Cookies, Upload/Download, Async
+* Servlets, JSP: Filters, Events, Servlet Config, Servlet Context, Implicit Object, Scriplets, Directives, Standard Actions"
+* JSP: EL, JSTL, Tag Files
+* Spring Foundations: Spring Core, Testing, Security	IoC, DI; Testing Components; Basic Auth, Form Auth, User Info
+* Slides
+* Github atualizado
+* projetos maven java-gs-html5, java-gs-servletsjsp, java-gs-springframework, java-gs-springboot
