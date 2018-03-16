@@ -192,9 +192,12 @@ var deleteMovie = (key) => {
 
 var loadMovies = () => {
 	 var onLoad = (e) => {
-		var movies = JSON.parse(e.target.responseText);
+		var response = e.target.responseText;
 		tblBody.innerHTML = "";
-		movies.forEach((m) => addToTable(m));
+		if (response){
+			var movies = JSON.parse(response);
+			movies.forEach((m) => addToTable(m));
+		}
 	};
 	var onError = e => console.log(e);
 	xhrGet(moviesUri, "", onLoad, onError);

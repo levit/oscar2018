@@ -44,4 +44,12 @@ public class MovieService {
 		return repository.containsKey(key);
 	}
 
+	public List<Movie> findByCategory(String category) {
+		return repository.findByCategory(category);
+	}
+
+	public List<Movie> findAllSortBy(String sortBy) {
+		return repository.findAllSortBy(sortBy);
+	}
+
 }

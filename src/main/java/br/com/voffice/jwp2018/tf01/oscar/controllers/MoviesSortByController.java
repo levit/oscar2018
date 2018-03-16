@@ -1,12 +1,8 @@
 package br.com.voffice.jwp2018.tf01.oscar.controllers;
 
-import static br.com.voffice.jwp2018.tf01.oscar.controllers.MoviesControllerFunctions.toMapCollector;
-import static br.com.voffice.jwp2018.tf01.oscar.controllers.MoviesControllerFunctions.toMovie;
-import static br.com.voffice.jwp2018.tf01.oscar.controllers.MoviesControllerFunctions.toSingleMapper;
-
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -24,8 +20,8 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import br.com.voffice.jwp2018.tf01.oscar.domain.Movie;
 import br.com.voffice.jwp2018.tf01.oscar.services.MovieService;
 
-@WebServlet("/api/servlets/movies")
-public class MoviesController extends HttpServlet {
+@WebServlet("/api/servlets/movies/sortBy")
+public class MoviesSortByController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private static final MovieService service = new MovieService();
@@ -36,31 +32,25 @@ public class MoviesController extends HttpServlet {
 			   .registerModule(new JavaTimeModule());
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Map<String, String[]> parameterMap = req.getParameterMap();
-		Map<String,String> parameters =
-		parameterMap.entrySet().stream().map(toSingleMapper).collect(toMapCollector);
-		String key = MoviesControllerFunctions.keyFromParameters.apply(parameters);
-		if (key == null) {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return;
-		}
-		EntityExtractor<Movie> movieExtractor = MoviesControllerFunctions.extractMovieGetPost.apply(req);
-		if (MoviesControllerFunctions.respondRequired.apply(resp).apply(movieExtractor.title)) return;
-		if (MoviesControllerFunctions.respondRequired.apply(resp).apply(movieExtractor.releasedDate)) return;
-
-		boolean created = service.create(toMovie.apply(parameters));
-		int status = (created)? HttpServletResponse.SC_CREATED: HttpServletResponse.SC_CONFLICT;
-		resp.setStatus(status);
-	}
-
-	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
-		List<Movie> movies = service.findAll();
+		String sortBy = null;
+		sortBy = extractByField(req, "title", sortBy);
+		sortBy = extractByField(req, "budget", sortBy);
+		sortBy = extractByField(req, "rating", sortBy);
+		List<Movie> movies = service.findAllSortBy(sortBy);
 		resp.getWriter().write(toJSON(movies));
 	}
 
+	private static String extractByField(HttpServletRequest req, String field, String sortBy) {
+		boolean hasField = req.getParameterMap().containsKey(field);
+		String value = req.getParameter(field);
+		hasField = hasField && Arrays.asList("asc","desc").contains(value);
+		if (hasField) {
+			sortBy = field+"="+value;
+		}
+		return sortBy;
+	}
 	private static String toJSON(List<Movie> movies) {
 		try {
 			return mapper.writeValueAsString(movies);
@@ -70,4 +60,3 @@ public class MoviesController extends HttpServlet {
 		}
 	}
 }
-
