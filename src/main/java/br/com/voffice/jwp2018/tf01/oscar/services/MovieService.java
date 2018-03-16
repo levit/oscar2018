@@ -1,57 +1,47 @@
 package br.com.voffice.jwp2018.tf01.oscar.services;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import br.com.voffice.jwp2018.tf01.oscar.domain.Movie;
+import br.com.voffice.jwp2018.tf01.oscar.repositories.MovieRepository;
 
 public class MovieService {
 
-	public static final Logger logger = Logger.getGlobal();
-	public static final Map<String,Movie> repo = new HashMap<>();
+	public static final Logger logger = Logger.getLogger(MovieService.class.getName());
+	private MovieRepository repository = new MovieRepository();
 
 	public boolean create(Movie movie) {
-		boolean canCreate = ! repo.containsKey(movie.getKey());
-		if (canCreate) {
-			repo.put(movie.getKey(), movie);
-		}
-		logger.info("created= "+canCreate);
-		return canCreate;
+		boolean wasCreated = repository.create(movie);
+		logger.info(() -> movie.getKey()+" was created - " +wasCreated);
+		return wasCreated;
 	}
 
 	public boolean update(Movie movie) {
-		boolean canUpdate =  repo.containsKey(movie.getKey());
-		if (canUpdate) {
-			repo.put(movie.getKey(), movie);
-		}
-		logger.info("updated= "+canUpdate);
-		return canUpdate;
+		boolean wasUpdated = repository.update(movie);
+		logger.info(() -> movie.getKey()+" was updated - " +wasUpdated);
+		return wasUpdated;
 	}
 
 	public boolean remove(String key) {
-		boolean canRemove =  repo.containsKey(key);
-		if (canRemove) {
-			repo.remove(key);
-		}
-		logger.info("removed= "+canRemove);
-		return canRemove;
+		boolean wasRemoved = repository.remove(key);
+		logger.info(() -> key+" was removed - " +wasRemoved);
+		return wasRemoved;
 	}
 
 	public List<Movie> findAll(){
-		List<Movie> result = new ArrayList<Movie>(repo.values());
-		logger.info(" "+result.size()+" movies found");
+		List<Movie>  result = repository.findAll();
+		logger.info(() -> " Movies were found - " + (result.size() > 0));
 		return result;
 	}
 
 	public Movie findByKey(String key) {
-		logger.info(key +" exists ? "+(containsKey(key)));
-		return repo.getOrDefault(key, null);
+		logger.info(() -> key +" exists ? "+(containsKey(key)));
+		return repository.findByKey(key);
 	}
 
 	public boolean containsKey(String key) {
-		return repo.containsKey(key);
+		return repository.containsKey(key);
 	}
+
 }
