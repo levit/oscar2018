@@ -1,12 +1,15 @@
 package br.com.voffice.jwp2018.tf01.oscar.controllers;
 
 import java.time.LocalDate;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-public class EntityExtractor<E> {
+public class EntityExtractor<E> implements Iterable<FieldExtractor<?>> {
 
 	private final E entity;
-	private final List<FieldExtractor<?>> extractors;
+	private final Map<String,FieldExtractor<?>> extractorsMapping = new LinkedHashMap<>();
 	public final FieldExtractor<Long> id;
 	public final FieldExtractor<String> title;
 	public final FieldExtractor<LocalDate> releasedDate;
@@ -17,7 +20,9 @@ public class EntityExtractor<E> {
 	public EntityExtractor(E entity, List<FieldExtractor<?>> extractors) {
 		super();
 		this.entity = entity;
-		this.extractors = extractors;
+		for (FieldExtractor<?> e: extractors) {
+			extractorsMapping.put(e.getFieldName(), e);
+		}
 		this.id = (FieldExtractor<Long>) extractors.stream().filter(e -> "id".equals(e.getFieldName())).findFirst().orElse(null);
 		this.title = (FieldExtractor<String>) extractors.stream().filter(e -> "title".equals(e.getFieldName())).findFirst().orElse(null);
 		this.releasedDate = (FieldExtractor<LocalDate>) extractors.stream().filter(e -> "releasedDate".equals(e.getFieldName())).findFirst().orElse(null);
@@ -29,8 +34,15 @@ public class EntityExtractor<E> {
 		return entity;
 	}
 
-	public List<FieldExtractor<?>> getExtractors() {
-		return extractors;
+	public FieldExtractor<?> getExtractor(String fieldName) {
+		return extractorsMapping.get(fieldName);
 	}
+
+	@Override
+	public Iterator<FieldExtractor<?>> iterator() {
+		return extractorsMapping.values().stream().iterator();
+	}
+
+
 
 }

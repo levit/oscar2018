@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import br.com.voffice.jwp2018.tf01.oscar.commons.CollectionFunctions;
 import br.com.voffice.jwp2018.tf01.oscar.domain.Movie;
 
 public class MovieRepository {
@@ -45,11 +46,6 @@ public class MovieRepository {
 		return canRemove;
 	}
 
-	public List<Movie> findAll(){
-		List<Movie> result = new ArrayList<Movie>(REPO.values());
-		return result;
-	}
-
 	public Movie findByKey(String key) {
 		return REPO.getOrDefault(key, null);
 	}
@@ -58,8 +54,24 @@ public class MovieRepository {
 		return REPO.containsKey(key);
 	}
 
+	public List<Movie> findAll(int page, int size){
+		return CollectionFunctions.paginate(findAll(), page, size);
+	}
+
+	public List<Movie> findAll(){
+		return new ArrayList<>(REPO.values());
+	}
+
+	public List<Movie> findByCategory(String category, int page, int size) {
+		return CollectionFunctions.paginate(findByCategory(category), page, size);
+	}
+
 	public List<Movie> findByCategory(String category) {
 		return REPO.values().stream().filter(m -> m.getCategory().equals(category)).collect(Collectors.toList());
+	}
+
+	public List<Movie> findAllSortBy(String sortBy, int page, int size) {
+		return CollectionFunctions.paginate(findAllSortBy(sortBy), page, size);
 	}
 
 	public List<Movie> findAllSortBy(String sortBy) {

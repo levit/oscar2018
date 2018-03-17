@@ -48,7 +48,7 @@ public final class FieldExtractor<V> {
 	}
 
 	public boolean wasAccepted() {
-		return wasSubmitted() && wasConverted();
+		return (wasSubmitted() && wasConverted()) || (!isRequired() && !wasSubmitted());
 	}
 
 	public V getValue(V defaultValue) {

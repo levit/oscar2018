@@ -16,6 +16,7 @@ var fieldResultWinner = document.getElementById("movie.field.result.winner");
 var fieldResultNominee = document.getElementById("movie.field.result.nominee");
 var btnSave = document.getElementById("btnSave");
 var btnBestPicture = document.getElementById("btnBestPicture");
+var btnClear = document.getElementById("btnClear");
 
 var defineKey = (m) =>  m.title+m.releasedDate;
 var formatKey = (m) =>  m.title+" ("+m.releasedDate.split("-")[0]+")";
@@ -23,17 +24,18 @@ var formatKey = (m) =>  m.title+" ("+m.releasedDate.split("-")[0]+")";
 var showInfo = (m) =>  messageArea.innerHTML = m;
 var showError = (m) =>  messageArea.innerHTML = m;
 
+var isSuccess = e => e.target.status >= 200 && e.target.status < 400;
+
+var isError = e => !isSuccess(e);
+
 var onLoadDefault = e => {
-	var isSuccess = e.target.status >= 200 && e.target.status < 400;
-	if (isSuccess){
+	if (isSuccess(e)){
 		showInfo("Data = ("+e.target.resultText+").");
 	}
 }
 
 var onErrorDefault = e => {
-	var isSuccess = e.target.status >= 200 && e.target.status < 400;
-	console.log(e);
-	if (!isSuccess){
+	if (isError(e)){
 		showError("unknown error ("+e.target.status+").");
 	}
 }
@@ -234,6 +236,7 @@ var loadBestPicture = () => {
 var init = () => {
 	loadMovies();
 	btnSave.addEventListener("click", saveMovie);
+	btnClear.addEventListener("click", clearForm);
 	btnBestPicture.addEventListener("click", loadBestPicture);
 	btnSave.value=LABEL_CREATE;
 };

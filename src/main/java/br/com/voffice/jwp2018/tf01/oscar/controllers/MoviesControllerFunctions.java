@@ -12,14 +12,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,17 +33,6 @@ import br.com.voffice.jwp2018.tf01.oscar.domain.Movie;
 public final class MoviesControllerFunctions {
 	private MoviesControllerFunctions(){}
 
-	public static final Collector<Entry<String, String>, ?, Map<String, String>> toMapCollector = Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue);
-
-	public static final Function<Map<String,String>,Movie> toMovie = m -> {
-		return new Movie(m.get("title"),
-				LocalDate.parse(m.get("releasedDate")),
-				Double.parseDouble(m.get("budget")),
-				m.get("poster"),
-				Integer.parseInt(m.get("rating")),
-				m.get("category"),
-				Boolean.parseBoolean(m.get("result")));
-	};
 
 
 	public static final Function<Map<String,String>,String> keyFromParameters = parameters ->
@@ -170,29 +156,39 @@ public final class MoviesControllerFunctions {
 		return new FieldExtractor<Boolean>(n, submittedValue, convertedValue, r);
 	};
 
-	static final Function<HttpServletRequest, EntityExtractor<Movie>> extractMovieGetPost = (req) -> {
-		FieldExtractor<String> title = stringExtractor.apply("title").apply(req.getParameter("title")).apply(true);
+	static final Function<Map<String,String>, EntityExtractor<Movie>> extractMovie = parameters -> {
+		FieldExtractor<String> title = stringExtractor.apply("title").apply(parameters.get("title")).apply(true);
 		FieldExtractor<LocalDate> releasedDate = localDateExtractor.apply("releasedDate")
-				.apply(req.getParameter("releasedDate")).apply(false);
-		FieldExtractor<Double> budget = doubleExtractor.apply("budget").apply(req.getParameter("budget")).apply(false);
-		FieldExtractor<String> poster = stringExtractor.apply("poster").apply(req.getParameter("poster")).apply(false);
-		FieldExtractor<Integer> rating = integerExtractor.apply("rating").apply(req.getParameter("rating")).apply(false);
-		FieldExtractor<String> category = stringExtractor.apply("category").apply(req.getParameter("category")).apply(false);
-		FieldExtractor<Boolean> result = booleanExtractor.apply("result").apply(req.getParameter("result")).apply(false);
+				.apply(parameters.get("releasedDate")).apply(true);
+		FieldExtractor<Double> budget = doubleExtractor.apply("budget").apply(parameters.get("budget")).apply(false);
+		FieldExtractor<String> poster = stringExtractor.apply("poster").apply(parameters.get("poster")).apply(false);
+		FieldExtractor<Integer> rating = integerExtractor.apply("rating").apply(parameters.get("rating")).apply(false);
+		FieldExtractor<String> category = stringExtractor.apply("category").apply(parameters.get("category")).apply(false);
+		FieldExtractor<Boolean> result = booleanExtractor.apply("result").apply(parameters.get("result")).apply(false);
 		List<FieldExtractor<?>> extractors = Arrays.asList(title, releasedDate, budget, poster, rating, category, result);
 		Movie movie = new Movie(title.getValue(null), releasedDate.getValue(null),
 				budget.getValue(0.0), poster.getValue(null), rating.getValue(0),category.getValue(null),result.getValue(false));
 		return new EntityExtractor<Movie>(movie, extractors);
 	};
 
+	static final Function<HttpServletRequest, EntityExtractor<Movie>> extractMovieGetPost = (req) -> {
+		Map<String,String[]> parameterValues = req.getParameterMap();
+		Map<String,String> parameters = new HashMap<>();
+		for (Map.Entry<String, String[]> pv: parameterValues.entrySet()) {
+			String[] values = pv.getValue();
+			if (values.length > 0) parameters.put(pv.getKey(), values[0]);
+		}
+		return extractMovie.apply(parameters);
+	};
+
 	static Function<HttpServletResponse, Function<FieldExtractor<?>, Boolean>> respondRequired = resp -> e -> {
 		String name = e.getFieldName();
 		boolean result = false;
-		if (!e.wasAccepted()) {
+		if ((e.isRequired()) && (!e.wasAccepted())) {
 			result = true;
 			try {
-				resp.getWriter().write("{error: 'parameter.required', error_description: 'Parameter " + name
-						+ " is required ', error_source: '" + name + " parameter'}");
+				resp.getWriter().write("{\"error\": \"parameter.required\", \"error_description\": \"Parameter " + name
+						+ " is required\", \"error_source\": \"" + name + " parameter\", \"value\":\""+e.getSubmittedValue()+"\"}");
 				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			} catch (IOException ex) {
 				throw new IllegalStateException(ex);
@@ -201,26 +197,41 @@ public final class MoviesControllerFunctions {
 		return result;
 	};
 
+
+	static Function<HttpServletResponse, Function<FieldExtractor<?>, Boolean>> respondInvalid = resp -> e -> {
+		String name = e.getFieldName();
+		boolean result = false;
+		if ((!e.isRequired()) && (!e.wasConverted())) {
+			result = true;
+			try {
+				resp.getWriter().write("{\"error\": \"parameter.invalid\", \"error_description\": \"Parameter " + name
+						+ " is invalid\", \"error_source\": \"" + name + " parameter\", \"value\":\""+e.getSubmittedValue()+"\"}");
+				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			} catch (IOException ex) {
+				throw new IllegalStateException(ex);
+			}
+		}
+		return result;
+	};
 	static final Function<String[], String> getFirst = ss -> ss.length > 0 ? ss[0] : null;
 
 	static final Function<HttpServletRequest, EntityExtractor<Movie>> extractMoviePutDelete = (req) -> {
 		try {
 			Map<String, String> parameters = getParameters.apply(req.getInputStream());
-			FieldExtractor<String> title = stringExtractor.apply("title").apply(parameters.get("title")).apply(true);
-			FieldExtractor<LocalDate> releasedDate = localDateExtractor.apply("releasedDate")
-					.apply(parameters.get("releasedDate")).apply(false);
-			FieldExtractor<Double> budget = doubleExtractor.apply("budget").apply(parameters.get("budget")).apply(false);
-			FieldExtractor<String> poster = stringExtractor.apply("poster").apply(parameters.get("poster")).apply(false);
-			FieldExtractor<Integer> rating = integerExtractor.apply("rating").apply(parameters.get("rating")).apply(false);
-			FieldExtractor<String> category = stringExtractor.apply("category").apply(parameters.get("category")).apply(false);
-			FieldExtractor<Boolean> result = booleanExtractor.apply("result").apply(parameters.get("result")).apply(false);
-			List<FieldExtractor<?>> extractors = Arrays.asList(title, releasedDate, budget, poster, rating, category, result);
-			Movie movie = new Movie(title.getValue(null), releasedDate.getValue(null),
-					budget.getValue(0.0), poster.getValue(null), rating.getValue(0),category.getValue(null),result.getValue(false));
-			return new EntityExtractor<Movie>(movie, extractors);
+			return extractMovie.apply(parameters);
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+	};
+
+	public static final Function<Map<String,String>,Movie> toMovie = m -> {
+		return new Movie(m.get("title"),
+				LocalDate.parse(m.get("releasedDate")),
+				Double.parseDouble(m.getOrDefault("budget","0")),
+				m.get("poster"),
+				Integer.parseInt(m.getOrDefault("rating","0")),
+				m.get("category"),
+				Boolean.parseBoolean(m.getOrDefault("result","false")));
 	};
 
 	public static final ObjectMapper mapper = new ObjectMapper()
