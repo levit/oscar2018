@@ -1,6 +1,3 @@
-var moviesUri = "http://localhost:8080/oscar/api/servlets/movies";
-var moviesKeyUri = "http://localhost:8080/oscar/api/servlets/movies/key";
-var moviesBestPictureUri = "http://localhost:8080/oscar/api/servlets/movies/oscar/nominees";
 var LABEL_CREATE = "Create";
 var LABEL_UPDATE = "Update";
 
