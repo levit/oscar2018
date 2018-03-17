@@ -1,7 +1,5 @@
 package br.com.voffice.jwp2018.tf01.oscar.controllers;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

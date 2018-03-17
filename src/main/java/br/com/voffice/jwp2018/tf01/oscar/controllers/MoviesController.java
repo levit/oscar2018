@@ -1,6 +1,5 @@
 package br.com.voffice.jwp2018.tf01.oscar.controllers;
 
-import static br.com.voffice.jwp2018.tf01.oscar.controllers.MoviesControllerFunctions.toMovie;
 import static br.com.voffice.jwp2018.tf01.oscar.controllers.MoviesControllerFunctions.toSingleMapper;
 
 import java.io.IOException;
@@ -26,23 +25,26 @@ public class MoviesController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Map<String, String[]> parameterMap = req.getParameterMap();
-		Map<String,String> parameters =
-		parameterMap.entrySet().stream().map(toSingleMapper).collect(CollectionFunctions.toMapCollector);
+		Map<String, String> parameters = parameterMap.entrySet().stream().map(toSingleMapper)
+				.collect(CollectionFunctions.toMapCollector);
 		String key = MoviesControllerFunctions.keyFromParameters.apply(parameters);
 		if (key == null) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 		EntityExtractor<Movie> movieExtractor = MoviesControllerFunctions.extractMovieGetPost.apply(req);
-		if (MoviesControllerFunctions.respondRequired.apply(resp).apply(movieExtractor.getExtractor("title"))) return;
-		if (MoviesControllerFunctions.respondRequired.apply(resp).apply(movieExtractor.getExtractor("releasedDate"))) return;
-		for(FieldExtractor<?> fe: movieExtractor) {
-			if (fe.wasAccepted()) continue;
+		if (MoviesControllerFunctions.respondRequired.apply(resp).apply(movieExtractor.getExtractor("title")))
+			return;
+		if (MoviesControllerFunctions.respondRequired.apply(resp).apply(movieExtractor.getExtractor("releasedDate")))
+			return;
+		for (FieldExtractor<?> fe : movieExtractor) {
+			if (fe.wasAccepted())
+				continue;
 			MoviesControllerFunctions.respondInvalid.apply(resp).apply(fe);
 			return;
 		}
 		boolean created = service.create(movieExtractor.getEntity());
-		int status = (created)? HttpServletResponse.SC_CREATED: HttpServletResponse.SC_CONFLICT;
+		int status = (created) ? HttpServletResponse.SC_CREATED : HttpServletResponse.SC_CONFLICT;
 		resp.setStatus(status);
 	}
 
@@ -50,9 +52,11 @@ public class MoviesController extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
 		List<Movie> movies = service.findAll();
-		resp.getWriter().write(MoviesControllerFunctions.toJSON(movies));
+		try {
+			resp.getWriter().write(MoviesControllerFunctions.toJSON(movies));
+		} catch (IOException ioe) {
+			this.log(ioe.getMessage());
+		}
 	}
 
-
 }
-
