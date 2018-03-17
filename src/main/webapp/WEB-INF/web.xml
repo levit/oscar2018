@@ -5,7 +5,7 @@
 	id="WebApp_ID" version="3.1">
 	<context-param>
 		<param-name>poster_path</param-name>
-		<param-value>/tmp/posters</param-value>
+		<param-value>/tmp</param-value>
 	</context-param>
 	<!-- <login-config>
 		<auth-method>FORM</auth-method>
