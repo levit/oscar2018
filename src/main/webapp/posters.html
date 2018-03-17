@@ -27,14 +27,16 @@
 		</select>
 		<div class="text-center">
 		<img id="posterImage" class="img-fluid img-thumbnail"/>
+		<a id="posterLink" href="#">Download</a>
 		</div>
 	</div>
 
-	<script type="text/javascript" src="posters-uris.js"></script>
+	<script type="text/javascript" src="posters-uris.js?sdfsdsds"></script>
 
 	<script type="text/javascript">
 		var postersSelect = document.getElementById("postersSelect");
 		var posterImage = document.getElementById("posterImage");
+		var posterLink = document.getElementById("posterLink");
 		var findPosters = () => {
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", postersUri,true);
@@ -48,11 +50,23 @@
 		};
 		xhr.send();
 		};
+		var downloadPoster = () => {
+			var selectedPoster = postersSelect.options[postersSelect.selectedIndex];
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", postersDownloadUri+selectedPoster.value, true);
+			xhr.onload = (e) => {
+				var contents = e.target.responseText;
+				console.log(e.target.responseText);
+				posterImage.src = contents;
+			};
+			xhr.send();
+		};
 		var showPoster = () => {
 			var selectedPoster = postersSelect.options[postersSelect.selectedIndex];
 			posterImage.src = POSTER_SERVER+"/"+selectedPoster.value;
 		};
 		postersSelect.addEventListener("change", showPoster);
+		posterLink.addEventListener("click", downloadPoster);
 		addEventListener("load", findPosters());
 	</script>
 </body>
